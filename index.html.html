@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mon site</title>
+</head>
+<body>
+
+ at > /mnt/user-data/outputs/quiz-politique-2027.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Présidentielle 2027 — Pour qui votez-vous ?</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a1a2e 50%, #16213e 100%);
+    font-family: Georgia, 'Times New Roman', serif;
+    color: #f0f0f0;
+    padding: 16px;
+  }
+  #app { max-width: 640px; margin: 0 auto; }
+
+  /* HEADER */
+  .header { text-align: center; margin-bottom: 20px; }
+  .header-sub { font-size: 11px; letter-spacing: 4px; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
+  .header-year { font-size: 26px; font-weight: bold; color: #f8fafc; }
+
+  /* PROGRESS */
+  .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .progress-label { font-size: 12px; color: #64748b; }
+  .progress-cat {
+    font-size: 11px; padding: 2px 10px; border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06);
+  }
+  .progress-bar-bg { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-bottom: 20px; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+
+  /* QUESTION CARD */
+  .question-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 24px 24px 20px;
+    margin-bottom: 16px;
+  }
+  .question-text { font-size: 18px; font-weight: bold; color: #f1f5f9; line-height: 1.4; margin-bottom: 20px; }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option-btn {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+    color: #cbd5e1;
+    font-size: 14px;
+    font-family: Georgia, serif;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .option-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+  .option-btn.selected { color: #fff; }
+  .radio-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: transparent;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; color: #fff; transition: all 0.2s;
+  }
+  .radio-dot.checked { }
+
+  /* NEXT BUTTON */
+  .next-btn {
+    width: 100%; padding: 16px;
+    background: rgba(255,255,255,0.07);
+    border: none; border-radius: 12px;
+    color: #475569; font-size: 15px; font-weight: bold;
+    font-family: Georgia, serif;
+    cursor: not-allowed; letter-spacing: 1px; transition: all 0.3s;
+  }
+  .next-btn.active { cursor: pointer; color: #fff; }
+
+  /* CATEGORY LEGEND */
+  .cat-legend { text-align: center; margin-top: 16px; font-size: 11px; color: #475569; line-height: 1.8; }
+
+  /* RESULTS */
+  #results { display: none; max-width: 680px; margin: 0 auto; }
+  .results-header { text-align: center; margin-bottom: 32px; }
+  .results-sub { font-size: 14px; letter-spacing: 4px; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px; }
+  .results-title { font-size: 28px; font-weight: bold; color: #f8fafc; }
+
+  .winner-card {
+    border-radius: 16px; padding: 28px 32px; margin-bottom: 24px;
+    text-align: center; border: 2px solid;
+  }
+  .winner-label { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; }
+  .winner-emoji { font-size: 48px; margin-bottom: 8px; }
+  .winner-name { font-size: 30px; font-weight: bold; color: #fff; margin-bottom: 4px; }
+  .winner-party { font-size: 16px; color: #94a3b8; margin-bottom: 4px; }
+  .winner-tag { display: inline-block; color: #fff; font-size: 13px; padding: 4px 14px; border-radius: 20px; margin-bottom: 16px; }
+  .winner-score-box { background: rgba(255,255,255,0.07); border-radius: 12px; padding: 8px 0; }
+  .winner-score-num { font-size: 36px; font-weight: bold; }
+  .winner-score-label { font-size: 13px; color: #94a3b8; }
+
+  .ranking-title { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #94a3b8; margin-bottom: 16px; }
+  .rank-item {
+    border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
+    display: flex; align-items: center; gap: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.04);
+  }
+  .rank-num { font-size: 16px; color: #64748b; font-weight: bold; width: 24px; text-align: center; }
+  .rank-emoji { font-size: 22px; }
+  .rank-info { flex: 1; }
+  .rank-name { font-weight: bold; font-size: 15px; color: #f1f5f9; }
+  .rank-party { font-size: 12px; color: #64748b; }
+  .rank-bar-bg { margin-top: 6px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+  .rank-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .rank-score { font-size: 20px; font-weight: bold; min-width: 46px; text-align: right; }
+
+  .disclaimer {
+    background: rgba(255,255,255,0.04); border-radius: 12px;
+    padding: 16px; margin-bottom: 24px;
+    font-size: 12px; color: #64748b; line-height: 1.6;
+  }
+  .restart-btn {
+    width: 100%; padding: 16px;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    border: none; border-radius: 12px;
+    color: #fff; font-size: 16px; font-weight: bold;
+    font-family: Georgia, serif;
+    cursor: pointer; letter-spacing: 1px;
+    margin-bottom: 24px;
+  }
+
+  /* SHARE */
+  .share-section { text-align: center; margin-bottom: 24px; }
+  .share-title { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #94a3b8; margin-bottom: 14px; }
+  .share-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .share-btn {
+    padding: 10px 20px; border: none; border-radius: 10px;
+    font-size: 14px; font-weight: bold; cursor: pointer;
+    font-family: Georgia, serif; transition: opacity 0.2s;
+  }
+  .share-btn:hover { opacity: 0.85; }
+  .share-copy { background: rgba(255,255,255,0.12); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.2); }
+  .share-x { background: #000; color: #fff; border: 1px solid #333; }
+  .share-wa { background: #25D366; color: #fff; }
+  .share-fb { background: #1877F2; color: #fff; }
+  .copied-msg { font-size: 12px; color: #10b981; margin-top: 8px; height: 16px; }
+</style>
+</head>
+<body>
+
+<div id="quiz-screen">
+  <div id="app">
+    <div class="header">
+      <div class="header-sub">Quiz présidentielle</div>
+      <div class="header-year">2027</div>
+    </div>
+    <div class="progress-row">
+      <span class="progress-label" id="q-counter">Question 1 / 50</span>
+      <span class="progress-cat" id="q-cat" style="color:#f59e0b;border-color:#f59e0b55;background:#f59e0b11;">Économie</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="prog-fill" style="width:0%;background:linear-gradient(90deg,#f59e0b,#8b5cf6);"></div>
+    </div>
+    <div class="question-card">
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="options-list"></div>
+    </div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">Question suivante →</button>
+    <div class="cat-legend" id="cat-legend"></div>
+  </div>
+</div>
+
+<div id="results">
+  <div class="results-header">
+    <div class="results-sub">Résultats de votre quiz</div>
+    <div class="results-title">Votre profil politique 2027</div>
+  </div>
+  <div id="winner-card-container"></div>
+  <div style="margin-bottom:24px;">
+    <div class="ranking-title">Classement complet</div>
+    <div id="ranking-list"></div>
+  </div>
+  <div class="share-section">
+    <div class="share-title">Partager mes résultats</div>
+    <div class="share-btns">
+      <button class="share-btn share-copy" onclick="copyLink()">📋 Copier le lien</button>
+      <button class="share-btn share-x" onclick="shareX()">𝕏 Twitter/X</button>
+      <button class="share-btn share-wa" onclick="shareWhatsApp()">💬 WhatsApp</button>
+      <button class="share-btn share-fb" onclick="shareFacebook()">📘 Facebook</button>
+    </div>
+    <div class="copied-msg" id="copied-msg"></div>
+  </div>
+  <div class="disclaimer">⚠️ Ce quiz est un outil indicatif basé sur des positions politiques générales. Il ne reflète pas l'ensemble des nuances des programmes ni les évolutions en cours. Les candidatures ne sont pas toutes officialisées à ce jour.</div>
+  <button class="restart-btn" onclick="restart()">↺ Recommencer le quiz</button>
+</div>
+
+<script>
+const questions = [
+  { id:1, category:"Économie", text:"Pour réduire la dette publique, il faut avant tout…", options:[
+    {label:"Couper massivement dans les dépenses de l'État",scores:{retailleau:3,philippe:2,attal:1,bardella:2,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Augmenter les impôts des plus riches et des grandes entreprises",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Stimuler la croissance via l'investissement public",scores:{retailleau:-1,philippe:1,attal:1,bardella:0,melenchon:2,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+    {label:"Réduire drastiquement le nombre de fonctionnaires",scores:{retailleau:2,philippe:1,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+  ]},
+  {id:2,category:"Économie",text:"Concernant le SMIC, vous pensez qu'il faudrait…",options:[
+    {label:"L'augmenter significativement au-dessus de 1 800 €",scores:{retailleau:-2,philippe:-1,attal:0,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"L'indexer automatiquement sur l'inflation uniquement",scores:{retailleau:1,philippe:1,attal:1,bardella:1,melenchon:0,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:1}},
+    {label:"Le moduler par secteur ou territoire",scores:{retailleau:2,philippe:2,attal:1,bardella:0,melenchon:-2,ruffin:-1,glucksmann:0,tondelier:0,dupont_aignan:1}},
+    {label:"L'augmenter modérément pour ne pas pénaliser les entreprises",scores:{retailleau:0,philippe:1,attal:2,bardella:1,melenchon:-1,ruffin:0,glucksmann:1,tondelier:1,dupont_aignan:1}},
+  ]},
+  {id:3,category:"Économie",text:"Votre position sur la retraite à 64 ans :",options:[
+    {label:"Il faut l'abroger et revenir à 60 ans",scores:{retailleau:-3,philippe:-2,attal:-2,bardella:-1,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:-1}},
+    {label:"La maintenir, c'est une nécessité économique",scores:{retailleau:2,philippe:3,attal:2,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:0}},
+    {label:"La ramener à 62 ans comme compromis",scores:{retailleau:-1,philippe:0,attal:0,bardella:1,melenchon:-1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:1}},
+    {label:"Repousser encore davantage l'âge légal",scores:{retailleau:3,philippe:1,attal:1,bardella:-1,melenchon:-3,ruffin:-3,glucksmann:-2,tondelier:-3,dupont_aignan:0}},
+  ]},
+  {id:4,category:"Économie",text:"Face aux grandes entreprises du CAC 40 :",options:[
+    {label:"Les taxer davantage sur leurs superprofits",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Les laisser libres, elles créent de l'emploi",scores:{retailleau:3,philippe:2,attal:2,bardella:0,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Les encourager à relocaliser en France",scores:{retailleau:1,philippe:1,attal:1,bardella:2,melenchon:1,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:3}},
+    {label:"Les nationaliser dans les secteurs stratégiques",scores:{retailleau:-3,philippe:-2,attal:-2,bardella:-1,melenchon:3,ruffin:2,glucksmann:0,tondelier:1,dupont_aignan:-1}},
+  ]},
+  {id:5,category:"Économie",text:"Sur le libre-échange international :",options:[
+    {label:"Promouvoir des accords de libre-échange pour booster l'économie",scores:{retailleau:1,philippe:3,attal:3,bardella:-2,melenchon:-3,ruffin:-2,glucksmann:1,tondelier:-1,dupont_aignan:-2}},
+    {label:"Protéger l'économie française avec des droits de douane",scores:{retailleau:1,philippe:-1,attal:-1,bardella:3,melenchon:2,ruffin:2,glucksmann:-1,tondelier:0,dupont_aignan:3}},
+    {label:"Réguler les échanges mais rester ouvert",scores:{retailleau:1,philippe:1,attal:1,bardella:0,melenchon:0,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+    {label:"Sortir des traités commerciaux européens",scores:{retailleau:-2,philippe:-3,attal:-3,bardella:1,melenchon:3,ruffin:2,glucksmann:-2,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:6,category:"Immigration",text:"Sur le droit d'asile :",options:[
+    {label:"Le durcir fortement, trop de demandes abusives",scores:{retailleau:3,philippe:2,attal:1,bardella:3,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Le maintenir tel quel, c'est un droit fondamental",scores:{retailleau:-2,philippe:0,attal:0,bardella:-3,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"L'améliorer avec des procédures plus rapides",scores:{retailleau:0,philippe:1,attal:2,bardella:0,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+    {label:"Suspendre temporairement toute immigration",scores:{retailleau:2,philippe:-1,attal:-1,bardella:3,melenchon:-3,ruffin:-2,glucksmann:-2,tondelier:-3,dupont_aignan:2}},
+  ]},
+  {id:7,category:"Immigration",text:"Sur la régularisation des sans-papiers :",options:[
+    {label:"Régulariser massivement ceux qui travaillent et s'intègrent",scores:{retailleau:-3,philippe:-2,attal:-1,bardella:-3,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-2}},
+    {label:"Expulser systématiquement tous les sans-papiers",scores:{retailleau:3,philippe:0,attal:0,bardella:3,melenchon:-3,ruffin:-3,glucksmann:-2,tondelier:-3,dupont_aignan:2}},
+    {label:"Examiner au cas par cas selon des critères stricts",scores:{retailleau:1,philippe:2,attal:2,bardella:0,melenchon:0,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:0}},
+    {label:"Leur donner un statut de travailleur temporaire",scores:{retailleau:-1,philippe:1,attal:1,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:-1}},
+  ]},
+  {id:8,category:"Immigration",text:"Le « grand remplacement » est selon vous…",options:[
+    {label:"Une réalité qui menace l'identité française",scores:{retailleau:2,philippe:-2,attal:-2,bardella:3,melenchon:-3,ruffin:-3,glucksmann:-3,tondelier:-3,dupont_aignan:1}},
+    {label:"Une théorie complotiste dangereuse à rejeter",scores:{retailleau:-2,philippe:2,attal:2,bardella:-2,melenchon:3,ruffin:2,glucksmann:3,tondelier:3,dupont_aignan:-1}},
+    {label:"Un sujet tabou qu'il faut pouvoir débattre sereinement",scores:{retailleau:1,philippe:0,attal:0,bardella:2,melenchon:-1,ruffin:-1,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Une instrumentalisation politique à combattre",scores:{retailleau:-1,philippe:1,attal:1,bardella:-2,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+  ]},
+  {id:9,category:"Sécurité",text:"Face à la délinquance, la priorité est de…",options:[
+    {label:"Recruter massivement dans les forces de l'ordre",scores:{retailleau:3,philippe:2,attal:2,bardella:3,melenchon:-1,ruffin:-1,glucksmann:1,tondelier:0,dupont_aignan:2}},
+    {label:"S'attaquer aux causes sociales (pauvreté, éducation)",scores:{retailleau:-2,philippe:0,attal:0,bardella:-2,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Construire plus de prisons et durcir les peines",scores:{retailleau:3,philippe:1,attal:1,bardella:3,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Réformer la police et la justice en profondeur",scores:{retailleau:-2,philippe:0,attal:1,bardella:-2,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+  ]},
+  {id:10,category:"Sécurité",text:"Sur la légalisation du cannabis :",options:[
+    {label:"Le légaliser et réguler comme l'alcool",scores:{retailleau:-3,philippe:-1,attal:-1,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-2}},
+    {label:"Maintenir la prohibition et renforcer les sanctions",scores:{retailleau:3,philippe:1,attal:1,bardella:2,melenchon:-2,ruffin:-1,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Dépénaliser l'usage mais pas la vente",scores:{retailleau:-1,philippe:1,attal:1,bardella:-1,melenchon:1,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Légaliser uniquement à des fins médicales",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:0,ruffin:0,glucksmann:1,tondelier:1,dupont_aignan:0}},
+  ]},
+  {id:11,category:"Europe",text:"Votre vision de l'Union Européenne :",options:[
+    {label:"Approfondir l'intégration, vers une Europe fédérale",scores:{retailleau:-1,philippe:2,attal:3,bardella:-2,melenchon:-2,ruffin:-1,glucksmann:3,tondelier:2,dupont_aignan:-3}},
+    {label:"La quitter et retrouver notre souveraineté totale",scores:{retailleau:-1,philippe:-3,attal:-3,bardella:0,melenchon:2,ruffin:1,glucksmann:-3,tondelier:-2,dupont_aignan:2}},
+    {label:"La réformer de l'intérieur pour la rendre plus souveraine",scores:{retailleau:2,philippe:1,attal:0,bardella:2,melenchon:0,ruffin:1,glucksmann:0,tondelier:1,dupont_aignan:1}},
+    {label:"Une Europe des nations, coopération sans fédéralisme",scores:{retailleau:2,philippe:1,attal:0,bardella:3,melenchon:-1,ruffin:0,glucksmann:-1,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:12,category:"Europe",text:"Sur l'euro :",options:[
+    {label:"En sortir pour retrouver notre monnaie nationale",scores:{retailleau:-1,philippe:-3,attal:-3,bardella:-1,melenchon:2,ruffin:1,glucksmann:-2,tondelier:-1,dupont_aignan:2}},
+    {label:"Le conserver, il est un pilier de notre économie",scores:{retailleau:2,philippe:3,attal:3,bardella:1,melenchon:-2,ruffin:-1,glucksmann:3,tondelier:2,dupont_aignan:-2}},
+    {label:"Le réformer pour le rendre plus flexible",scores:{retailleau:0,philippe:1,attal:0,bardella:1,melenchon:1,ruffin:1,glucksmann:1,tondelier:1,dupont_aignan:0}},
+    {label:"Créer une monnaie commune non unique en parallèle",scores:{retailleau:-1,philippe:-1,attal:-1,bardella:0,melenchon:2,ruffin:1,glucksmann:-1,tondelier:0,dupont_aignan:1}},
+  ]},
+  {id:13,category:"Écologie",text:"Face au changement climatique, l'État doit…",options:[
+    {label:"Planifier la transition écologique avec contraintes fortes",scores:{retailleau:-2,philippe:0,attal:0,bardella:-1,melenchon:3,ruffin:2,glucksmann:2,tondelier:3,dupont_aignan:-1}},
+    {label:"Inciter sans contraindre, le marché s'adaptera",scores:{retailleau:2,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:0,tondelier:-3,dupont_aignan:1}},
+    {label:"Investir massivement dans le nucléaire",scores:{retailleau:2,philippe:2,attal:1,bardella:2,melenchon:0,ruffin:1,glucksmann:1,tondelier:-3,dupont_aignan:2}},
+    {label:"Interdire les énergies fossiles rapidement",scores:{retailleau:-3,philippe:-1,attal:0,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-2}},
+  ]},
+  {id:14,category:"Écologie",text:"Sur le nucléaire :",options:[
+    {label:"Sortir du nucléaire le plus vite possible",scores:{retailleau:-3,philippe:-2,attal:-1,bardella:-2,melenchon:-1,ruffin:0,glucksmann:-1,tondelier:3,dupont_aignan:-2}},
+    {label:"Construire massivement de nouveaux réacteurs",scores:{retailleau:3,philippe:3,attal:2,bardella:3,melenchon:-1,ruffin:0,glucksmann:1,tondelier:-3,dupont_aignan:3}},
+    {label:"Maintenir le parc actuel sans en construire de nouveaux",scores:{retailleau:0,philippe:0,attal:1,bardella:0,melenchon:1,ruffin:1,glucksmann:1,tondelier:-1,dupont_aignan:0}},
+    {label:"Développer les renouvelables en priorité sur le nucléaire",scores:{retailleau:-2,philippe:-1,attal:0,bardella:-1,melenchon:1,ruffin:1,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+  ]},
+  {id:15,category:"Écologie",text:"Sur la voiture individuelle :",options:[
+    {label:"L'interdire en ville et développer les transports en commun",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-2,melenchon:1,ruffin:1,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+    {label:"Laisser aux gens la liberté de choisir leur moyen de transport",scores:{retailleau:2,philippe:2,attal:2,bardella:3,melenchon:-1,ruffin:-1,glucksmann:0,tondelier:-2,dupont_aignan:2}},
+    {label:"Accélérer le passage au tout-électrique",scores:{retailleau:0,philippe:1,attal:2,bardella:0,melenchon:1,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Investir dans le train et le vélo à la place",scores:{retailleau:-1,philippe:0,attal:0,bardella:-1,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+  ]},
+  {id:16,category:"Société",text:"Sur la laïcité :",options:[
+    {label:"La durcir, notamment interdire le voile à l'université",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:-2,ruffin:0,glucksmann:1,tondelier:-1,dupont_aignan:2}},
+    {label:"La maintenir telle quelle, elle fonctionne bien",scores:{retailleau:0,philippe:2,attal:2,bardella:1,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:1}},
+    {label:"L'assouplir pour mieux respecter la diversité religieuse",scores:{retailleau:-3,philippe:-1,attal:-1,bardella:-2,melenchon:2,ruffin:2,glucksmann:0,tondelier:2,dupont_aignan:-2}},
+    {label:"L'étendre aux entreprises privées et associations",scores:{retailleau:1,philippe:0,attal:0,bardella:1,melenchon:-1,ruffin:1,glucksmann:1,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:17,category:"Société",text:"Sur la GPA (gestation pour autrui) :",options:[
+    {label:"L'interdire absolument, c'est contraire à la dignité humaine",scores:{retailleau:3,philippe:1,attal:0,bardella:1,melenchon:-1,ruffin:-1,glucksmann:-1,tondelier:-1,dupont_aignan:2}},
+    {label:"La légaliser de façon encadrée en France",scores:{retailleau:-3,philippe:0,attal:1,bardella:-1,melenchon:2,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:-2}},
+    {label:"Maintenir l'interdiction actuelle sans l'inscrire dans la Constitution",scores:{retailleau:1,philippe:2,attal:2,bardella:2,melenchon:0,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:1}},
+    {label:"Autoriser uniquement la GPA altruiste (non commerciale)",scores:{retailleau:-2,philippe:0,attal:1,bardella:-1,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:-1}},
+  ]},
+  {id:18,category:"Société",text:"Sur l'euthanasie / aide à mourir :",options:[
+    {label:"La légaliser avec un cadre strict",scores:{retailleau:-2,philippe:1,attal:2,bardella:0,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"S'y opposer fermement pour des raisons éthiques",scores:{retailleau:3,philippe:0,attal:-1,bardella:1,melenchon:-2,ruffin:-1,glucksmann:-1,tondelier:-1,dupont_aignan:1}},
+    {label:"Développer d'abord les soins palliatifs",scores:{retailleau:2,philippe:2,attal:1,bardella:2,melenchon:0,ruffin:0,glucksmann:1,tondelier:1,dupont_aignan:2}},
+    {label:"Laisser chaque individu décider librement",scores:{retailleau:-1,philippe:1,attal:2,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:0}},
+  ]},
+  {id:19,category:"Société",text:"Sur le droit à l'IVG :",options:[
+    {label:"Le garantir constitutionnellement comme droit fondamental",scores:{retailleau:-2,philippe:1,attal:2,bardella:0,melenchon:3,ruffin:3,glucksmann:3,tondelier:3,dupont_aignan:-1}},
+    {label:"Le maintenir dans la loi sans l'élever au rang constitutionnel",scores:{retailleau:1,philippe:1,attal:0,bardella:1,melenchon:0,ruffin:0,glucksmann:0,tondelier:0,dupont_aignan:1}},
+    {label:"Réduire les délais légaux autorisés",scores:{retailleau:3,philippe:-1,attal:-2,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-2,tondelier:-3,dupont_aignan:0}},
+    {label:"Supprimer la clause de conscience des médecins pour l'IVG",scores:{retailleau:-3,philippe:0,attal:0,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-2}},
+  ]},
+  {id:20,category:"Société",text:"Sur la peine de mort :",options:[
+    {label:"La rétablir pour les crimes les plus graves",scores:{retailleau:1,philippe:-2,attal:-2,bardella:2,melenchon:-3,ruffin:-3,glucksmann:-3,tondelier:-3,dupont_aignan:0}},
+    {label:"Elle doit rester abolie sans exception",scores:{retailleau:0,philippe:2,attal:2,bardella:-1,melenchon:3,ruffin:3,glucksmann:3,tondelier:3,dupont_aignan:1}},
+    {label:"Le débat mérite d'être posé sans tabou",scores:{retailleau:2,philippe:-1,attal:-1,bardella:2,melenchon:-2,ruffin:-2,glucksmann:-2,tondelier:-2,dupont_aignan:1}},
+    {label:"Renforcer les peines de prison plutôt que d'y revenir",scores:{retailleau:2,philippe:2,attal:2,bardella:2,melenchon:-1,ruffin:-1,glucksmann:0,tondelier:-1,dupont_aignan:2}},
+  ]},
+  {id:21,category:"Éducation",text:"Sur l'école publique :",options:[
+    {label:"Augmenter massivement les salaires des enseignants",scores:{retailleau:0,philippe:1,attal:1,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:1}},
+    {label:"Développer l'école privée et les chèques éducation",scores:{retailleau:2,philippe:1,attal:1,bardella:1,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Remettre la discipline et le niveau au centre",scores:{retailleau:3,philippe:2,attal:2,bardella:2,melenchon:0,ruffin:1,glucksmann:1,tondelier:0,dupont_aignan:2}},
+    {label:"Réduire les inégalités scolaires par la mixité sociale",scores:{retailleau:-2,philippe:0,attal:0,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+  ]},
+  {id:22,category:"Éducation",text:"Sur l'uniforme scolaire :",options:[
+    {label:"Le rendre obligatoire dans toutes les écoles",scores:{retailleau:3,philippe:2,attal:2,bardella:2,melenchon:-2,ruffin:-1,glucksmann:0,tondelier:-1,dupont_aignan:2}},
+    {label:"Laisser chaque établissement décider",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:0,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:1}},
+    {label:"S'y opposer, cela brime les libertés individuelles",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-1,melenchon:2,ruffin:2,glucksmann:1,tondelier:2,dupont_aignan:-1}},
+    {label:"Expérimenter avant de généraliser",scores:{retailleau:0,philippe:1,attal:2,bardella:0,melenchon:-1,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:0}},
+  ]},
+  {id:23,category:"Santé",text:"Sur l'hôpital public :",options:[
+    {label:"Massivement le refinancer et recruter des soignants",scores:{retailleau:-1,philippe:1,attal:1,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Le réformer avec plus de logique managériale",scores:{retailleau:2,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:0,tondelier:-2,dupont_aignan:1}},
+    {label:"Développer les partenariats public-privé",scores:{retailleau:2,philippe:2,attal:2,bardella:1,melenchon:-2,ruffin:-2,glucksmann:0,tondelier:-2,dupont_aignan:1}},
+    {label:"Redonner aux soignants le contrôle de leur hôpital",scores:{retailleau:-1,philippe:0,attal:1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+  ]},
+  {id:24,category:"Santé",text:"Sur la Sécurité sociale :",options:[
+    {label:"La préserver et l'étendre (lunettes, dentaire, psy)",scores:{retailleau:-1,philippe:0,attal:1,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"La réformer pour la rendre plus efficiente",scores:{retailleau:2,philippe:3,attal:2,bardella:1,melenchon:-2,ruffin:-1,glucksmann:1,tondelier:-1,dupont_aignan:1}},
+    {label:"Laisser plus de place aux mutuelles et assurances privées",scores:{retailleau:3,philippe:1,attal:1,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"La défendre bec et ongles contre toute privatisation",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+  ]},
+  {id:25,category:"Démocratie",text:"Sur la VIe République :",options:[
+    {label:"En établir une avec davantage de démocratie participative",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Garder la Ve République, elle fonctionne",scores:{retailleau:2,philippe:2,attal:2,bardella:2,melenchon:-2,ruffin:-1,glucksmann:1,tondelier:0,dupont_aignan:1}},
+    {label:"La réformer à la marge (proportionnelle, RIC)",scores:{retailleau:0,philippe:1,attal:1,bardella:1,melenchon:1,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:2}},
+    {label:"Renforcer les pouvoirs du Parlement face à l'exécutif",scores:{retailleau:-1,philippe:0,attal:0,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:1}},
+  ]},
+  {id:26,category:"Démocratie",text:"Sur le référendum d'initiative citoyenne (RIC) :",options:[
+    {label:"Le mettre en place pour toutes les grandes questions",scores:{retailleau:-1,philippe:-1,attal:-1,bardella:2,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:2}},
+    {label:"S'y opposer, ça favorise les populismes",scores:{retailleau:1,philippe:2,attal:2,bardella:-1,melenchon:-2,ruffin:-2,glucksmann:0,tondelier:-1,dupont_aignan:-1}},
+    {label:"L'envisager de façon très encadrée et limitée",scores:{retailleau:1,philippe:1,attal:1,bardella:1,melenchon:0,ruffin:0,glucksmann:1,tondelier:1,dupont_aignan:1}},
+    {label:"Introduire une dose de proportionnelle d'abord",scores:{retailleau:0,philippe:0,attal:1,bardella:0,melenchon:1,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:1}},
+  ]},
+  {id:27,category:"International",text:"Sur la guerre en Ukraine :",options:[
+    {label:"Soutenir massivement l'Ukraine militairement et financièrement",scores:{retailleau:1,philippe:2,attal:3,bardella:-1,melenchon:-3,ruffin:-1,glucksmann:3,tondelier:1,dupont_aignan:-1}},
+    {label:"Négocier une paix rapidement même imparfaite",scores:{retailleau:0,philippe:-1,attal:-1,bardella:2,melenchon:2,ruffin:1,glucksmann:-2,tondelier:0,dupont_aignan:1}},
+    {label:"Aider l'Ukraine mais sans envoyer de troupes françaises",scores:{retailleau:2,philippe:2,attal:1,bardella:1,melenchon:-1,ruffin:0,glucksmann:1,tondelier:2,dupont_aignan:0}},
+    {label:"Rester neutre et ne pas se mêler de ce conflit",scores:{retailleau:-2,philippe:-2,attal:-2,bardella:1,melenchon:1,ruffin:-1,glucksmann:-2,tondelier:-1,dupont_aignan:2}},
+  ]},
+  {id:28,category:"International",text:"Sur les relations avec les États-Unis :",options:[
+    {label:"Renforcer l'alliance atlantique et l'OTAN",scores:{retailleau:1,philippe:2,attal:3,bardella:-1,melenchon:-3,ruffin:-2,glucksmann:2,tondelier:0,dupont_aignan:-2}},
+    {label:"S'en distancer pour une Europe plus autonome",scores:{retailleau:0,philippe:0,attal:0,bardella:1,melenchon:2,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:2}},
+    {label:"Construire une souveraineté européenne de défense",scores:{retailleau:1,philippe:2,attal:2,bardella:0,melenchon:1,ruffin:1,glucksmann:3,tondelier:1,dupont_aignan:0}},
+    {label:"Sortir de l'OTAN et mener une politique étrangère indépendante",scores:{retailleau:-2,philippe:-2,attal:-3,bardella:0,melenchon:3,ruffin:2,glucksmann:-2,tondelier:0,dupont_aignan:3}},
+  ]},
+  {id:29,category:"Médias",text:"Sur la concentration des médias :",options:[
+    {label:"Lutter contre, réguler et financer les médias publics",scores:{retailleau:-1,philippe:0,attal:0,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:1}},
+    {label:"Laisser le marché décider",scores:{retailleau:2,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Nationaliser certains médias stratégiques",scores:{retailleau:-2,philippe:-2,attal:-2,bardella:-1,melenchon:3,ruffin:2,glucksmann:-1,tondelier:1,dupont_aignan:-1}},
+    {label:"Favoriser les médias indépendants et locaux",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:2}},
+  ]},
+  {id:30,category:"Médias",text:"Sur la régulation des réseaux sociaux :",options:[
+    {label:"Les réguler fortement pour lutter contre la désinformation",scores:{retailleau:1,philippe:2,attal:2,bardella:-1,melenchon:1,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Défendre la liberté d'expression absolue en ligne",scores:{retailleau:1,philippe:0,attal:0,bardella:2,melenchon:-1,ruffin:0,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Les taxer davantage pour financer les médias traditionnels",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:2,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:1}},
+    {label:"Les interdire aux mineurs de moins de 16 ans",scores:{retailleau:2,philippe:2,attal:2,bardella:2,melenchon:1,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:2}},
+  ]},
+  {id:31,category:"Vision",text:"La France est avant tout…",options:[
+    {label:"Une nation d'une culture et d'une civilisation particulières",scores:{retailleau:3,philippe:1,attal:0,bardella:3,melenchon:-2,ruffin:-1,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Une République universaliste ouverte sur le monde",scores:{retailleau:-1,philippe:2,attal:2,bardella:-2,melenchon:2,ruffin:1,glucksmann:3,tondelier:1,dupont_aignan:-1}},
+    {label:"Un pays qui doit d'abord protéger ses citoyens",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:2,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:2}},
+    {label:"Un modèle social à défendre et à exporter",scores:{retailleau:-1,philippe:1,attal:1,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+  ]},
+  {id:32,category:"Vision",text:"Le principal ennemi de la France aujourd'hui, c'est…",options:[
+    {label:"L'islamisme et le communautarisme",scores:{retailleau:3,philippe:1,attal:1,bardella:3,melenchon:-2,ruffin:-1,glucksmann:0,tondelier:-1,dupont_aignan:2}},
+    {label:"Les inégalités sociales et la pauvreté",scores:{retailleau:-2,philippe:0,attal:0,bardella:-1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Le réchauffement climatique et l'effondrement écologique",scores:{retailleau:-2,philippe:0,attal:0,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+    {label:"La perte de souveraineté et l'influence étrangère",scores:{retailleau:1,philippe:0,attal:-1,bardella:2,melenchon:1,ruffin:1,glucksmann:-1,tondelier:0,dupont_aignan:3}},
+  ]},
+  {id:33,category:"Vision",text:"Sur la discrimination positive :",options:[
+    {label:"S'y opposer, seul le mérite doit compter",scores:{retailleau:3,philippe:2,attal:1,bardella:2,melenchon:-1,ruffin:-1,glucksmann:0,tondelier:-2,dupont_aignan:2}},
+    {label:"La mettre en place pour les groupes discriminés",scores:{retailleau:-3,philippe:-1,attal:0,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:2,dupont_aignan:-2}},
+    {label:"Préférer des politiques sociales universelles",scores:{retailleau:0,philippe:2,attal:2,bardella:0,melenchon:1,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:0}},
+    {label:"Travailler sur les discriminations sans quotas",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:0,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:1}},
+  ]},
+  {id:34,category:"Vision",text:"Sur le féminisme :",options:[
+    {label:"Défendre une égalité stricte femmes-hommes dans tous les domaines",scores:{retailleau:-1,philippe:1,attal:2,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:3,dupont_aignan:-1}},
+    {label:"Protéger les femmes sans remettre en cause la famille traditionnelle",scores:{retailleau:3,philippe:1,attal:0,bardella:2,melenchon:-2,ruffin:-1,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Combattre les violences sexistes et les inégalités salariales en priorité",scores:{retailleau:0,philippe:2,attal:2,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:3,dupont_aignan:0}},
+    {label:"Éviter les excès idéologiques tout en défendant l'égalité",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:-1,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:1}},
+  ]},
+  {id:35,category:"Vision",text:"Sur le wokisme :",options:[
+    {label:"C'est une menace réelle pour nos valeurs républicaines",scores:{retailleau:3,philippe:1,attal:1,bardella:3,melenchon:-2,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:2}},
+    {label:"Un terme creux utilisé pour réprimer les luttes sociales",scores:{retailleau:-3,philippe:-1,attal:-1,bardella:-3,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:-2}},
+    {label:"Certaines dérives méritent d'être critiquées sans généraliser",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:-1,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:1}},
+    {label:"Un débat culturel qui ne devrait pas occuper l'espace politique",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:0,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+  ]},
+  {id:36,category:"Logement",text:"Sur le droit au logement :",options:[
+    {label:"Construire massivement de logements sociaux",scores:{retailleau:-2,philippe:0,attal:0,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Libérer le marché immobilier pour faire baisser les prix",scores:{retailleau:3,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Encadrer les loyers dans les villes tendues",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Aider les primo-accédants à la propriété",scores:{retailleau:1,philippe:2,attal:2,bardella:2,melenchon:0,ruffin:1,glucksmann:1,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:37,category:"Agriculture",text:"Sur l'agriculture française :",options:[
+    {label:"Soutenir massivement les petits agriculteurs et le bio",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:2,ruffin:3,glucksmann:2,tondelier:3,dupont_aignan:1}},
+    {label:"Défendre le modèle agricole intensif qui nourrit les Français",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:-1,ruffin:0,glucksmann:-1,tondelier:-3,dupont_aignan:2}},
+    {label:"Protéger les agriculteurs des distorsions de concurrence européenne",scores:{retailleau:1,philippe:1,attal:1,bardella:3,melenchon:1,ruffin:2,glucksmann:0,tondelier:1,dupont_aignan:3}},
+    {label:"Accélérer la transition vers une alimentation durable",scores:{retailleau:-2,philippe:0,attal:1,bardella:-1,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+  ]},
+  {id:38,category:"Travail",text:"Sur les 35 heures :",options:[
+    {label:"Les supprimer pour travailler plus et gagner plus",scores:{retailleau:3,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Les maintenir, c'est une conquête sociale",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Passer à 32 heures pour partager le travail",scores:{retailleau:-3,philippe:-2,attal:-2,bardella:-1,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:-2}},
+    {label:"Assouplir pour laisser les entreprises et salariés négocier",scores:{retailleau:2,philippe:3,attal:3,bardella:1,melenchon:-2,ruffin:-1,glucksmann:1,tondelier:-1,dupont_aignan:1}},
+  ]},
+  {id:39,category:"Travail",text:"Sur le droit de grève dans les services publics :",options:[
+    {label:"Maintenir le droit de grève sans restriction",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-1,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:-1}},
+    {label:"Instaurer un service minimum obligatoire",scores:{retailleau:3,philippe:2,attal:2,bardella:2,melenchon:-2,ruffin:-1,glucksmann:1,tondelier:-1,dupont_aignan:2}},
+    {label:"L'interdire dans certains secteurs vitaux",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Renforcer le dialogue social pour éviter les grèves",scores:{retailleau:0,philippe:2,attal:2,bardella:0,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+  ]},
+  {id:40,category:"Fiscalité",text:"Sur l'impôt sur la fortune (ISF/IFI) :",options:[
+    {label:"Rétablir un ISF fort sur tous les patrimoines élevés",scores:{retailleau:-3,philippe:-1,attal:-1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Maintenir la suppression, l'ISF freinait l'investissement",scores:{retailleau:3,philippe:2,attal:3,bardella:1,melenchon:-3,ruffin:-3,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Rétablir un ISF limité aux très grands patrimoines",scores:{retailleau:-1,philippe:0,attal:0,bardella:0,melenchon:2,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:0}},
+    {label:"Taxer davantage les revenus du capital que du travail",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+  ]},
+  {id:41,category:"Fiscalité",text:"Sur la TVA :",options:[
+    {label:"La baisser sur les produits de première nécessité",scores:{retailleau:0,philippe:1,attal:1,bardella:2,melenchon:2,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:1}},
+    {label:"Augmenter la TVA sur les produits de luxe et polluants",scores:{retailleau:-1,philippe:0,attal:0,bardella:-1,melenchon:2,ruffin:2,glucksmann:1,tondelier:2,dupont_aignan:0}},
+    {label:"La baisser globalement pour stimuler la consommation",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:-1,ruffin:-1,glucksmann:0,tondelier:-1,dupont_aignan:1}},
+    {label:"Réduire les niches fiscales plutôt que toucher à la TVA",scores:{retailleau:0,philippe:2,attal:1,bardella:0,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:0}},
+  ]},
+  {id:42,category:"Société",text:"Sur la légalisation des drogues dures :",options:[
+    {label:"Réprimer encore plus durement le trafic et l'usage",scores:{retailleau:3,philippe:2,attal:1,bardella:3,melenchon:-2,ruffin:-1,glucksmann:-1,tondelier:-1,dupont_aignan:2}},
+    {label:"Légaliser et encadrer pour sortir les usagers de la criminalité",scores:{retailleau:-3,philippe:-1,attal:0,bardella:-2,melenchon:2,ruffin:2,glucksmann:1,tondelier:2,dupont_aignan:-2}},
+    {label:"Développer la prévention et les salles de consommation",scores:{retailleau:-2,philippe:0,attal:1,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:-1}},
+    {label:"Démanteler les réseaux en priorité",scores:{retailleau:2,philippe:2,attal:2,bardella:2,melenchon:0,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:43,category:"Démocratie",text:"Sur le vote obligatoire :",options:[
+    {label:"Le rendre obligatoire pour renforcer la démocratie",scores:{retailleau:0,philippe:1,attal:1,bardella:0,melenchon:2,ruffin:2,glucksmann:2,tondelier:1,dupont_aignan:2}},
+    {label:"Défendre le droit de ne pas voter",scores:{retailleau:1,philippe:1,attal:1,bardella:1,melenchon:-1,ruffin:0,glucksmann:-1,tondelier:0,dupont_aignan:0}},
+    {label:"Introduire le vote blanc comme vote valable",scores:{retailleau:0,philippe:1,attal:1,bardella:1,melenchon:1,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:2}},
+    {label:"Moderniser les modes de vote (vote en ligne, dimanche+)",scores:{retailleau:0,philippe:2,attal:2,bardella:1,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:1}},
+  ]},
+  {id:44,category:"International",text:"Sur le conflit israélo-palestinien :",options:[
+    {label:"Soutenir fermement Israël et son droit à se défendre",scores:{retailleau:2,philippe:1,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:1,tondelier:-2,dupont_aignan:0}},
+    {label:"Reconnaître l'État palestinien et sanctionner Israël",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-2,melenchon:3,ruffin:3,glucksmann:-1,tondelier:2,dupont_aignan:-1}},
+    {label:"Défendre une solution à deux États et le droit international",scores:{retailleau:0,philippe:2,attal:1,bardella:0,melenchon:1,ruffin:1,glucksmann:2,tondelier:2,dupont_aignan:1}},
+    {label:"Rester neutre et œuvrer pour la paix",scores:{retailleau:0,philippe:1,attal:0,bardella:1,melenchon:-1,ruffin:0,glucksmann:1,tondelier:0,dupont_aignan:2}},
+  ]},
+  {id:45,category:"Économie",text:"Sur la privatisation des autoroutes :",options:[
+    {label:"Renationaliser les autoroutes à terme",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:1,melenchon:3,ruffin:3,glucksmann:1,tondelier:2,dupont_aignan:1}},
+    {label:"Laisser les concessions se poursuivre, c'est efficace",scores:{retailleau:2,philippe:2,attal:2,bardella:1,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:0}},
+    {label:"Imposer une baisse des péages",scores:{retailleau:0,philippe:0,attal:0,bardella:2,melenchon:2,ruffin:2,glucksmann:1,tondelier:1,dupont_aignan:1}},
+    {label:"Rendre les autoroutes gratuites",scores:{retailleau:-2,philippe:-2,attal:-2,bardella:1,melenchon:3,ruffin:3,glucksmann:0,tondelier:1,dupont_aignan:0}},
+  ]},
+  {id:46,category:"Société",text:"Sur le transhumanisme et l'IA :",options:[
+    {label:"Réguler strictement pour protéger l'humain",scores:{retailleau:1,philippe:1,attal:0,bardella:1,melenchon:2,ruffin:2,glucksmann:1,tondelier:2,dupont_aignan:1}},
+    {label:"Investir massivement pour ne pas décrocher",scores:{retailleau:1,philippe:3,attal:3,bardella:1,melenchon:-1,ruffin:-1,glucksmann:2,tondelier:0,dupont_aignan:0}},
+    {label:"Encadrer éthiquement sans freiner l'innovation",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:1,ruffin:1,glucksmann:2,tondelier:1,dupont_aignan:1}},
+    {label:"Ralentir le développement pour en évaluer les risques",scores:{retailleau:0,philippe:-1,attal:-1,bardella:0,melenchon:1,ruffin:2,glucksmann:0,tondelier:2,dupont_aignan:0}},
+  ]},
+  {id:47,category:"Sécurité",text:"Sur la vidéosurveillance dans l'espace public :",options:[
+    {label:"La généraliser avec reconnaissance faciale",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:-3,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"L'interdire, c'est une atteinte aux libertés",scores:{retailleau:-2,philippe:-1,attal:-1,bardella:-1,melenchon:2,ruffin:2,glucksmann:0,tondelier:2,dupont_aignan:-1}},
+    {label:"Maintenir le cadre actuel avec un contrôle démocratique",scores:{retailleau:1,philippe:2,attal:2,bardella:1,melenchon:0,ruffin:0,glucksmann:2,tondelier:0,dupont_aignan:1}},
+    {label:"L'étendre aux transports et zones sensibles uniquement",scores:{retailleau:2,philippe:2,attal:2,bardella:2,melenchon:-1,ruffin:0,glucksmann:1,tondelier:-1,dupont_aignan:1}},
+  ]},
+  {id:48,category:"Vision",text:"Pour vous, la priorité absolue du prochain président sera…",options:[
+    {label:"Restaurer l'autorité de l'État et la sécurité",scores:{retailleau:3,philippe:2,attal:1,bardella:3,melenchon:-2,ruffin:-1,glucksmann:0,tondelier:-1,dupont_aignan:2}},
+    {label:"Réduire les inégalités et améliorer le quotidien des Français",scores:{retailleau:-1,philippe:1,attal:1,bardella:1,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Sauver le climat et préparer la France au XXIe siècle",scores:{retailleau:-2,philippe:0,attal:1,bardella:-1,melenchon:2,ruffin:2,glucksmann:1,tondelier:3,dupont_aignan:-1}},
+    {label:"Redresser l'économie et la compétitivité française",scores:{retailleau:2,philippe:3,attal:3,bardella:1,melenchon:-1,ruffin:-1,glucksmann:1,tondelier:-1,dupont_aignan:1}},
+  ]},
+  {id:49,category:"Vision",text:"En politique, vous faites avant tout confiance à…",options:[
+    {label:"L'expérience et la compétence des élites",scores:{retailleau:1,philippe:3,attal:3,bardella:-1,melenchon:-2,ruffin:-2,glucksmann:2,tondelier:0,dupont_aignan:-1}},
+    {label:"Le peuple et sa sagesse collective",scores:{retailleau:-1,philippe:-1,attal:-1,bardella:2,melenchon:2,ruffin:3,glucksmann:0,tondelier:1,dupont_aignan:2}},
+    {label:"Les corps intermédiaires (syndicats, associations)",scores:{retailleau:-1,philippe:0,attal:0,bardella:-1,melenchon:2,ruffin:2,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Un leader fort capable de faire des choix courageux",scores:{retailleau:2,philippe:1,attal:1,bardella:2,melenchon:1,ruffin:0,glucksmann:0,tondelier:-1,dupont_aignan:1}},
+  ]},
+  {id:50,category:"Vision",text:"Le mot qui vous inspire le plus en politique :",options:[
+    {label:"Ordre",scores:{retailleau:3,philippe:1,attal:1,bardella:2,melenchon:-2,ruffin:-2,glucksmann:-1,tondelier:-2,dupont_aignan:1}},
+    {label:"Justice",scores:{retailleau:-1,philippe:0,attal:0,bardella:0,melenchon:3,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+    {label:"Liberté",scores:{retailleau:2,philippe:2,attal:3,bardella:1,melenchon:-1,ruffin:0,glucksmann:2,tondelier:1,dupont_aignan:2}},
+    {label:"Fraternité",scores:{retailleau:-1,philippe:1,attal:1,bardella:-1,melenchon:2,ruffin:3,glucksmann:2,tondelier:2,dupont_aignan:0}},
+  ]},
+];
+
+const candidates = {
+  retailleau:{name:"Bruno Retailleau",party:"Les Républicains",color:"#1e3a8a",emoji:"🔵",desc:"Droite conservatrice"},
+  philippe:{name:"Édouard Philippe",party:"Horizons",color:"#0ea5e9",emoji:"🔷",desc:"Centre-droit"},
+  attal:{name:"Gabriel Attal",party:"Renaissance",color:"#3b82f6",emoji:"💙",desc:"Centre"},
+  bardella:{name:"Jordan Bardella",party:"Rassemblement National",color:"#78716c",emoji:"⬛",desc:"Extrême droite"},
+  melenchon:{name:"Jean-Luc Mélenchon",party:"La France Insoumise",color:"#dc2626",emoji:"🔴",desc:"Gauche radicale"},
+  ruffin:{name:"François Ruffin",party:"Gauche populaire",color:"#b91c1c",emoji:"❤️",desc:"Gauche sociale"},
+  glucksmann:{name:"Raphaël Glucksmann",party:"Parti Socialiste",color:"#ec4899",emoji:"🌹",desc:"Gauche sociale-démocrate"},
+  tondelier:{name:"Marine Tondelier",party:"Les Écologistes",color:"#16a34a",emoji:"🟢",desc:"Écologie politique"},
+  dupont_aignan:{name:"Nicolas Dupont-Aignan",party:"Debout la France",color:"#7c3aed",emoji:"🟣",desc:"Droite souverainiste"},
+};
+
+const categoryColors = {
+  "Économie":"#f59e0b","Immigration":"#ef4444","Sécurité":"#3b82f6",
+  "Europe":"#8b5cf6","Écologie":"#10b981","Société":"#ec4899",
+  "Éducation":"#f97316","Santé":"#14b8a6","Démocratie":"#6366f1",
+  "International":"#0ea5e9","Médias":"#a78bfa","Vision":"#64748b",
+  "Logement":"#d97706","Agriculture":"#84cc16","Travail":"#06b6d4",
+  "Fiscalité":"#fb7185",
+};
+
+let current = 0;
+let answers = {};
+let selected = null;
+let finalResults = null;
+
+function renderQuestion() {
+  const q = questions[current];
+  const cc = categoryColors[q.category] || "#64748b";
+  const progress = (current / questions.length) * 100;
+
+  document.getElementById('q-counter').textContent = `Question ${current + 1} / ${questions.length}`;
+  document.getElementById('q-cat').textContent = q.category;
+  document.getElementById('q-cat').style.color = cc;
+  document.getElementById('q-cat').style.borderColor = cc + '55';
+  document.getElementById('q-cat').style.background = cc + '11';
+  document.getElementById('prog-fill').style.width = progress + '%';
+  document.getElementById('prog-fill').style.background = `linear-gradient(90deg, ${cc}, #8b5cf6)`;
+  document.getElementById('q-text').textContent = q.text;
+
+  const optsList = document.getElementById('options-list');
+  optsList.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (selected === i ? ' selected' : '');
+    if (selected === i) {
+      btn.style.background = `linear-gradient(135deg, ${cc}44, ${cc}22)`;
+      btn.style.borderColor = cc;
+    }
+    btn.innerHTML = `<div class="radio-dot${selected === i ? ' checked' : ''}" id="dot-${i}" style="${selected === i ? `background:${cc};border-color:${cc};` : ''}">${selected === i ? '✓' : ''}</div>${opt.label}`;
+    btn.onclick = () => selectOption(i);
+    optsList.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  if (selected !== null) {
+    nextBtn.className = 'next-btn active';
+    nextBtn.style.background = `linear-gradient(135deg, ${cc}, #8b5cf6)`;
+  } else {
+    nextBtn.className = 'next-btn';
+    nextBtn.style.background = 'rgba(255,255,255,0.07)';
+  }
+  nextBtn.textContent = current + 1 === questions.length ? 'Voir mes résultats →' : 'Question suivante →';
+
+  // Category legend
+  const legend = document.getElementById('cat-legend');
+  let html = '';
+  Object.keys(categoryColors).forEach(cat => {
+    const done = questions.slice(0, current + 1).filter(q2 => q2.category === cat).length;
+    const total = questions.filter(q2 => q2.category === cat).length;
+    if (total > 0) html += `<span style="margin-right:8px;"><span style="color:${categoryColors[cat]}">●</span> ${cat} (${done}/${total})</span>`;
+  });
+  legend.innerHTML = html;
+}
+
+function selectOption(i) {
+  selected = i;
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (selected === null) return;
+  answers[questions[current].id] = selected;
+  selected = null;
+  if (current + 1 >= questions.length) {
+    computeResults();
+  } else {
+    current++;
+    renderQuestion();
+  }
+}
+
+function computeResults() {
+  const totals = {};
+  Object.keys(candidates).forEach(c => totals[c] = 0);
+  questions.forEach(q => {
+    const idx = answers[q.id];
+    if (idx !== undefined) {
+      const sc = q.options[idx].scores;
+      Object.keys(sc).forEach(c => { totals[c] = (totals[c] || 0) + sc[c]; });
+    }
+  });
+  const vals = Object.values(totals);
+  const min = Math.min(...vals), max = Math.max(...vals);
+  const normalized = {};
+  Object.keys(totals).forEach(c => {
+    normalized[c] = Math.round(((totals[c] - min) / (max - min)) * 100);
+  });
+  finalResults = Object.entries(normalized).sort((a, b) => b[1] - a[1]);
+  showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.style.display = 'block';
+
+  const [winnerKey, winnerScore] = finalResults[0];
+  const w = candidates[winnerKey];
+
+  // Winner card
+  document.getElementById('winner-card-container').innerHTML = `
+    <div class="winner-card" style="background:linear-gradient(135deg,${w.color}33,${w.color}11);border-color:${w.color};">
+      <div class="winner-label">Votre candidat</div>
+      <div class="winner-emoji">${w.emoji}</div>
+      <div class="winner-name">${w.name}</div>
+      <div class="winner-party">${w.party}</div>
+      <div class="winner-tag" style="background:${w.color}">${w.desc}</div>
+      <div class="winner-score-box">
+        <div class="winner-score-num" style="color:${w.color}">${winnerScore}%</div>
+        <div class="winner-score-label">de compatibilité</div>
+      </div>
+    </div>`;
+
+  // Ranking
+  const rankList = document.getElementById('ranking-list');
+  rankList.innerHTML = finalResults.map(([key, score], i) => {
+    const c = candidates[key];
+    return `<div class="rank-item" style="${i===0?`background:${c.color}22;border-color:${c.color}55;`:''}">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-emoji">${c.emoji}</div>
+      <div class="rank-info">
+        <div class="rank-name">${c.name}</div>
+        <div class="rank-party">${c.party}</div>
+        <div class="rank-bar-bg"><div class="rank-bar-fill" style="width:${score}%;background:linear-gradient(90deg,${c.color},${c.color}aa);"></div></div>
+      </div>
+      <div class="rank-score" style="color:${c.color}">${score}%</div>
+    </div>`;
+  }).join('');
+
+  // Save results to URL hash for sharing
+  const params = new URLSearchParams();
+  params.set('r', finalResults.map(([k,v]) => k[0]+k.slice(-2)+v).join(','));
+  window.location.hash = params.toString();
+}
+
+function restart() {
+  current = 0; answers = {}; selected = null; finalResults = null;
+  window.location.hash = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  renderQuestion();
+}
+
+// Share functions
+function getShareText() {
+  if (!finalResults) return '';
+  const [key, score] = finalResults[0];
+  const w = candidates[key];
+  return `🗳️ Mon profil politique 2027 : ${w.emoji} ${w.name} (${w.party}) avec ${score}% de compatibilité ! Et toi ? Fais le quiz :`;
+}
+
+function getShareUrl() {
+  return window.location.href.split('#')[0] + (window.location.hash || '');
+}
+
+function copyLink() {
+  const url = window.location.href.split('#')[0];
+  navigator.clipboard.writeText(url).then(() => {
+    const msg = document.getElementById('copied-msg');
+    msg.textContent = '✓ Lien copié dans le presse-papier !';
+    setTimeout(() => msg.textContent = '', 2500);
+  });
+}
+
+function shareX() {
+  const text = encodeURIComponent(getShareText());
+  const url = encodeURIComponent(window.location.href.split('#')[0]);
+  window.open(`https://x.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function shareWhatsApp() {
+  const text = encodeURIComponent(getShareText() + '\n' + window.location.href.split('#')[0]);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function shareFacebook() {
+  const url = encodeURIComponent(window.location.href.split('#')[0]);
+  window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+}
+
+// Init
+renderQuestion();
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done"
